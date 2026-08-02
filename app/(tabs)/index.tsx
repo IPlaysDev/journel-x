@@ -1,11 +1,9 @@
-import { ScrollView, Text, View, TextInput, Pressable, FlatList, Alert } from 'react-native';
+import { ScrollView, Text, View, TextInput, Pressable, Alert } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useJournal } from '@/lib/journal-context';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
-  const router = useRouter();
   const { chapters, currentChapterId, currentEntry, penColor, updateEntry, createChapter, setCurrentChapter, isLoading } = useJournal();
   const [content, setContent] = useState('');
   const [showNewChapterDialog, setShowNewChapterDialog] = useState(false);
@@ -110,21 +108,9 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="flex-1">
         {/* Book Header */}
         <View className="px-4 pt-4 pb-2">
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-2xl font-bold text-foreground">Journel X</Text>
-            <Pressable
-              onPress={() => router.push('/(tabs)/chapters')}
-              style={({ pressed }) => [
-                { paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#D4A574', borderRadius: 6 },
-                pressed && { opacity: 0.8 }
-              ]}
-            >
-              <Text className="text-foreground font-semibold text-sm">Chapters</Text>
-            </Pressable>
-          </View>
-
+          <Text className="text-2xl font-bold text-foreground">Journel X</Text>
           {currentChapter && (
-            <Text className="text-lg text-muted font-semibold">{currentChapter.title}</Text>
+            <Text className="text-lg text-muted font-semibold mt-2">{currentChapter.title}</Text>
           )}
         </View>
 
@@ -152,52 +138,48 @@ export default function HomeScreen() {
           <Text className="text-sm text-muted mb-2 font-semibold">Pen Color</Text>
           <View className="flex-row gap-3">
             <Pressable
-              onPress={() => router.push('/(tabs)/settings')}
+              onPress={() => setShowNewChapterDialog(false)}
               style={({ pressed }) => [
                 { flex: 1, paddingVertical: 10, borderRadius: 6, alignItems: 'center', borderWidth: 2, borderColor: penColor === 'black' ? '#1A1A1A' : '#D4A574', backgroundColor: penColor === 'black' ? '#1A1A1A' : '#F9EFE0' },
                 pressed && { opacity: 0.8 }
               ]}
             >
               <Text style={{ color: penColor === 'black' ? '#F5E6D3' : '#1A1A1A' }} className="font-semibold">
-                ● Black
+                Black
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => router.push('/(tabs)/settings')}
+              onPress={() => setShowNewChapterDialog(false)}
               style={({ pressed }) => [
                 { flex: 1, paddingVertical: 10, borderRadius: 6, alignItems: 'center', borderWidth: 2, borderColor: penColor === 'blue' ? '#2E5090' : '#D4A574', backgroundColor: penColor === 'blue' ? '#2E5090' : '#F9EFE0' },
                 pressed && { opacity: 0.8 }
               ]}
             >
               <Text style={{ color: penColor === 'blue' ? '#F5E6D3' : '#1A1A1A' }} className="font-semibold">
-                ● Blue
+                Blue
               </Text>
             </Pressable>
           </View>
         </View>
 
-        {/* Chapter List Preview */}
+        {/* Chapter List */}
         <View className="px-4 pb-4">
           <Text className="text-sm text-muted mb-2 font-semibold">Chapters ({chapters.length})</Text>
-          <FlatList
-            data={chapters}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => handleChapterSelect(item.id)}
-                style={({ pressed }) => [
-                  { paddingVertical: 10, paddingHorizontal: 12, marginBottom: 8, borderRadius: 6, backgroundColor: currentChapterId === item.id ? '#D4A574' : '#F9EFE0', borderLeftWidth: 4, borderLeftColor: currentChapterId === item.id ? '#8B7355' : '#D4A574' },
-                  pressed && { opacity: 0.8 }
-                ]}
-              >
-                <Text className="font-semibold text-foreground">{item.title}</Text>
-                <Text className="text-xs text-muted">
-                  {new Date(item.createdAt).toLocaleDateString()}
-                </Text>
-              </Pressable>
-            )}
-          />
+          {chapters.map((item) => (
+            <Pressable
+              key={item.id}
+              onPress={() => handleChapterSelect(item.id)}
+              style={({ pressed }) => [
+                { paddingVertical: 10, paddingHorizontal: 12, marginBottom: 8, borderRadius: 6, backgroundColor: currentChapterId === item.id ? '#D4A574' : '#F9EFE0', borderLeftWidth: 4, borderLeftColor: currentChapterId === item.id ? '#8B7355' : '#D4A574' },
+                pressed && { opacity: 0.8 }
+              ]}
+            >
+              <Text className="font-semibold text-foreground">{item.title}</Text>
+              <Text className="text-xs text-muted">
+                {new Date(item.createdAt).toLocaleDateString()}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       </ScrollView>
     </ScreenContainer>
